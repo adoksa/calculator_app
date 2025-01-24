@@ -10,44 +10,37 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         try {
-
             System.out.print("First Number: ");
             double num1 = scanner.nextDouble();
 
-
-            System.out.print("Give the Operator(+, -, *, /): ");
+            System.out.print("Give the Operator (+, -, *, /, √): "); // √ is the square root symbol
             char operator = scanner.next().charAt(0);
 
-
-            System.out.print("Second Number: ");
-            double num2 = scanner.nextDouble();
-
-
+            double num2 = 0; // Initialize num2 for operators that don't use it
+            if (operator != '√') {
+                System.out.print("Second Number: ");
+                num2 = scanner.nextDouble();
+            }
 
             try {
                 double result = calculate(num1, num2, operator);
                 System.out.println("Result: " + result);
                 saveResultToFile(result);
             } catch (ArithmeticException e) {
-                System.out.println("Arithmetic Error");
+                System.out.println("Arithmetic Error: " + e.getMessage());
             }
 
-
-
         } catch (Exception e) {
-
-
+            System.out.println("An error occurred: " + e.getMessage());
         } finally {
             scanner.close();
         }
     }
 
-
     public static double calculate(double num1, double num2, char operator) {
         switch (operator) {
             case '+':
                 return num1 + num2;
-
             case '-':
                 return num1 - num2;
             case '*':
@@ -55,19 +48,19 @@ public class Main {
             case '/':
                 if (num2 != 0) {
                     return num1 / num2;
-                } else if(num2 != 0) {
-                    return num1 / num2;
-                }else {
-                    System.out.println("Devision with Zero!");
-                    System.exit(1);
+                } else {
+                    throw new ArithmeticException("Division by zero is not allowed.");
+                }
+            case '√': // Square root operator- Fatjona
+                if (num1 >= 0) {
+                    return Math.sqrt(num1);
+                } else {
+                    throw new ArithmeticException("Cannot calculate the square root of a negative number.");
                 }
             default:
-                System.out.println("Incorrect operator!");
-                System.exit(1);
+                throw new IllegalArgumentException("Incorrect operator!");
         }
-        return 0;
     }
-
 
     public static void saveResultToFile(double result) {
         String resultString = "The Result is: " + result;
@@ -78,8 +71,9 @@ public class Main {
 
         try {
             Files.writeString(filePath, resultString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            System.out.println("The Result is Successfully in result.txt saved.");
+            System.out.println("The Result is Successfully saved in result.txt.");
         } catch (Exception e) {
-        }
+            System.out.println("Failed to save the result to the file: " + e.getMessage());
         }
     }
+}
